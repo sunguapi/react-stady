@@ -1,93 +1,68 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 
-// 上一节中我们通过setInterval内置函数来通过1秒进行一次渲染来实现动态渲染元素
-// 这节我们来实现真正的时钟Clock组件
-
-// 方法1:这种方法需要去使用setInterval这个函数来实现计数器的功能
-// 然而，它忽略了一个关键的技术细节：Clock 组件需要设置一个计时器，并且需要每秒更新 UI。
-// 理想情况下，我们希望只编写一次代码，便可以让 Clock 组件自我更新：
-
-//const root = ReactDOM.createRoot(document.getElementById('root'));
-//
-//function Clock(props) {
-//  return (
-//    <div>
-//      <h1>hello,world</h1>
-//      {/*也可以直接把toLocaleTimeString这个函数放在这里*/}
-//      <h2>It is {props.date.toLocaleTimeString()}</h2>
-//    </div>
-//  );
-//}
-//
-//function tick() {
-//  //toLocaleTimeString函数可以直接放在上面
-//  root.render(<Clock date={new Date()} />);
-//}
-//
-//setInterval(tick, 1000);
-
-// 方法2:通过state来实现 配合声明周期来实现
-// 三步来实现：date从props移到state中
-// 1.写出类组件，注意类组件的props是私有的所以要有this
-// 2.编写class构造函数，然后给this.state初始值；并且通过这种方式将props传递到父类的构造函数中
-
-// 正确的使用state，必须要确保的3件事<详见，文档>
-
-// 数据是向下流动的，组件可以把state作为props向下进行传递
-function FormattedDate(props) {
-  return (
-    <h2>It is {props.date.toLocaleTimeString()}</h2>
-  );
-}
-
-class Clock extends React.Component {
+// 事件处理
+// 首先了解setState 和 prevState
+// setState:只会使用最后一次的修改；会对之前的值进行覆盖；比如我现在要连续调用四处，每次在默认值0的基础上加1，第四次加完值是1；而不是4，是因为对之前的值进行了覆盖
+// prevState:会查看上一次的状态值
+class Toggle extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: new Date()
+      isToggleOn: true,
     };
+
+    // 为了在回调中使用 `this`，这个绑定是必不可少的
+    //this.handleClick = this.handleClick.bind(this);
+    // 如果想不加，可以有两种方法
+    // 1. 修改handleClick 函数为箭头函数
+    // 2. 通过在调用处使用箭头函数
   }
-  // 周期函数
-  componentDidMount() {
-    this.timerID = setInterval(
-      () => this.tick(),1000
-    );
+//
+ // handleClick() {
+ //   this.setState(prevState => ({
+ //     isToggleOn: !prevState.isToggleOn
+ //   }));
+ // }
+  
+  // 1. 修改handleClick为箭头函数
+  handleClick = () => {
+    this.setState(prevState => ({
+      isToggleOn: !prevState.isToggleOn
+    }));
   }
-  // 妙呀，首先我们要了解这两个函数是干什么的。
-  // componentDidMount这个周期函数就是当我们组件第一次被渲染到dom的时候，就会设置(任务)一个计时器，也就是挂载
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-  }
-  // componentWillUnmount周期函数在组件使用完，被删除的时候就会进行执行清除任务
-  tick() {
-    this.setState({
-      date: new Date()
-    });
-  }
-  // 之后就是因为dom一直在渲染所以这个函数会被一直调用,每次调用会修改date这个值
+
+
+  //render() {
+  //  return (
+  //    // 注意我们在使用class组件的时候一定要去绑定this，要不它不认识handleClick
+  //    // 你必须谨慎对待 JSX 回调函数中的 this，在 JavaScript 中，class 的方法默认不会绑定 this。如果你忘记绑定 this.handleClick 并把它传入了 onClick，当你调用这个函数的时候 this 的值为 undefined。
+  //    <button onClick={this.handleClick}>
+  //    // 应该也可以这样写 this.handleClick.bind
+  //      {this.state.isToggleOn ? 'ON' : 'OFF'}
+  //    </button>
+  //  );
+  //}
+
+  // 2. 通过在调用处使用箭头函数来实现this绑定,注意这里必须是函数形式
   render() {
     return (
-      <div>
-        <h1>hello, world!</h1>
-        {/*<h2>It is {this.state.date.toLocaleTimeString()}.</h2>*/}
-        <FormattedDate date={this.state.date} />
-      </div>
+      <button onClick={() => this.handleClick()}>
+        {this.state.isToggleOn ? 'ON' : 'OFF'}
+      </button>
     );
   }
-}
-
-//为了验证每个组件是独立的；可以这样子来实现
-function App() {
-  return (
-    <div>
-      <Clock/>
-      <Clock/>
-      <Clock/>
-    </div>
-  )
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-//root.render(<Clock />)
-root.render(<App />)
+root.render(<Toggle />);
+
+// <button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+// <button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+// 传递参数两种方法是等价的
+
+// 总结一共有四种方法
+// 1. 绑定bing在构造器中
+// 2. 在调用处绑定bind
+// 3. 对函数改造成箭头函数
+// 4. 在调用处使用箭头函数，函数要带小括号
