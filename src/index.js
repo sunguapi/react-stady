@@ -1,77 +1,106 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-// 1. 渲染初识
-// 通过react创建dom绑定一个根作为需要被替换的元素，之后render函数编译把jsx语法替换到root根标签内部
-//const root = ReactDOM.createRoot(
-//  document.getElementById('root')
-//);
-//const element = <h1>hello, world</h1>;
-//root.render(element);
-
-
-
-
-// 2. 更新已渲染的元素;react元素是不可变的
-// 根据我们已有的知识，更新 UI 唯一的方式是创建一个全新的元素，
-// 并将其传入 root.render()。
-//const root = ReactDOM.createRoot(
-//  document.getElementById('root')
-//);
+// 下面是一个简单的登陆判断操作
+//function UserGreeting(props) {
+//  return <h1>Welcome back!</h1>;
+//}
 //
-//function tick() {
-//  const element = (
-//    <div>
-//      <h1>hello, world!</h1>
-//      <h2>It is {new Date().toLocaleTimeString()}</h2>
-//    </div>
-//  );
-//  root.render(element);
+//function GuestGreeting(props) {
+//  return <h1>please sign up.</h1>;
 //}
-//// setInterval是回调函数每一秒都会回调一次，也就是每一秒都会render一次来实现react的改变
-//setInterval(tick, 1000);
-
-// 3. 组件和props
-// 3.1 函数组件和class组件
-
-// 函数组件简单理解就是通过传递了一个props对象，这个对象可以携带props信息
-//function Welcome(props) {
-//  return <h1>hello, {props.name}</h1>
+//
+//function Greeting(props) {
+//  const isLoggedIn = props.isLoggedIn;
+//  //if(isLoggedIn) {
+//  //  return <UserGreeting />;
+//  //}
+//  //return <GuestGreeting />;
+//  return isLoggedIn ? <UserGreeting /> : <GuestGreeting />;
 //}
+//
+//const root = ReactDOM.createRoot(document.getElementById('root'));
+//root.render(<Greeting isLoggedIn={true} />);
 
-// 类组件就是我们要继承react根组件，然后需要render来返回react元素（jsx）
-// 可以看到因为类自己继承了react所以自己需要执行reader来渲染，而方法只是返回了jsx给react解析
-// jsx是javascrip的扩展所以本来就可以返回主要是类继承了还是直接传递了props对象
-//class Welcome extends React.Component {
-//  render() {
-//    return <h1>hello, {this.props.name}</h1>
-//  }
-//}
+// 事例2 元素变量
+// 你可以使用变量来储存元素。 它可以帮助你有条件地渲染组件的一部分，而其他的渲染部分并不会因此而改变。
 
-// 渲染组件
-function Welcome(props) {
-  return <h1>hello, {props.name}</h1>;
+function UserGreeting(props) {
+  return <h1>Welcome back!</h1>;
 }
 
-function App() {
+function GuestGreeting(props) {
+  return <h1>please sign up.</h1>;
+}
+
+function Greeting(props) {
+  const isLoggedIn = props.isLoggedIn;
+  //if(isLoggedIn) {
+  //  return <UserGreeting />;
+  //}
+  //return <GuestGreeting />;
+  return isLoggedIn ? <UserGreeting /> : <GuestGreeting />;
+}
+
+
+function LoginButton(props) {
   return (
-    <div>
-      <Welcome name='sun'/>
-      
-      <Welcome name='jin'/>
-      
-      <Welcome name='bao'/>
-    </div>
-  )
+    <button onClick={props.onClick}>
+      Login
+    </button>
+  );
 }
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root')
-);
-//const element = <Welcome name='sunjinbao'/>;
-//root.render(element);
+function LogoutButton(props) {
+  return (
+    <button onClick={props.onClick}>
+      Logout
+    </button>
+  );
+}
 
-root.render(<App/>)
-// 可以知道函组件可以直接写成一个标签，若标签中写了属性，就可以传递掉props中
+// 创建一个有状态组件来控制渲染哪一个页面
+class LoginControl extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: false
+    };
+    this.handleLoginClick = this.handleLoginClick.bind(this);
+    this.handleLogoutClick = this.handleLogoutClick.bind(this);
+  }
 
+  handleLoginClick() {
+    this.setState({isLoggedIn: true});
+  }
+
+  handleLogoutClick() {
+    this.setState({isLoggedIn: false});
+  }
+
+  render() {
+    // 先初始化默认值
+    const isLoggedIn = this.state.isLoggedIn;
+    // 声明变量
+    let button;
+    // 判断渲染哪个button
+   // if(isLoggedIn) {
+   //   button = <LogoutButton onClick={this.handleLogoutClick} />;
+   // }else {
+   //   button = <LoginButton onClick={this.handleLoginClick} />;
+   // }
+
+    button = isLoggedIn ? <LogoutButton onClick={this.handleLogoutClick} /> : <LoginButton onClick={this.handleLoginClick} />
+
+    return (
+      <div>
+        <Greeting isLoggedIn={isLoggedIn} />
+        {button}
+      </div>
+    );
+  }
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<LoginControl />);
 
