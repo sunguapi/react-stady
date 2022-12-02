@@ -1,106 +1,67 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-// 下面是一个简单的登陆判断操作
-//function UserGreeting(props) {
-//  return <h1>Welcome back!</h1>;
+// 1. 运算符&&
+// 左边为true 则显示右边的数据；否则，则不显示数据
+
+//function Mailbox(props) {
+//  const unreadMessages = props.unreadMessages;
+//  return (
+//    <div>
+//      <h1>hello!</h1>
+//      {unreadMessages.length > 0 && 
+//        <h2>
+//          You have {unreadMessages.length} unread messages.
+//        </h2>
+//      }
+//    </div>
+//  );
 //}
 //
-//function GuestGreeting(props) {
-//  return <h1>please sign up.</h1>;
-//}
-//
-//function Greeting(props) {
-//  const isLoggedIn = props.isLoggedIn;
-//  //if(isLoggedIn) {
-//  //  return <UserGreeting />;
-//  //}
-//  //return <GuestGreeting />;
-//  return isLoggedIn ? <UserGreeting /> : <GuestGreeting />;
-//}
+//const message = ['react', 're: react', 're: re: react', 're: re: re: react'];
 //
 //const root = ReactDOM.createRoot(document.getElementById('root'));
-//root.render(<Greeting isLoggedIn={true} />);
+//root.render(<Mailbox unreadMessages={message} />);
 
-// 事例2 元素变量
-// 你可以使用变量来储存元素。 它可以帮助你有条件地渲染组件的一部分，而其他的渲染部分并不会因此而改变。
-
-function UserGreeting(props) {
-  return <h1>Welcome back!</h1>;
-}
-
-function GuestGreeting(props) {
-  return <h1>please sign up.</h1>;
-}
-
-function Greeting(props) {
-  const isLoggedIn = props.isLoggedIn;
-  //if(isLoggedIn) {
-  //  return <UserGreeting />;
-  //}
-  //return <GuestGreeting />;
-  return isLoggedIn ? <UserGreeting /> : <GuestGreeting />;
-}
-
-
-function LoginButton(props) {
+// 2. 大括号中也可以使用三目
+// 3. 阻止组件渲染
+function Warning(props) {
+  if(!props.warn) return null;
   return (
-    <button onClick={props.onClick}>
-      Login
-    </button>
-  );
+    <div className='warning'>
+      Warning!
+    </div>
+  )
 }
 
-function LogoutButton(props) {
-  return (
-    <button onClick={props.onClick}>
-      Logout
-    </button>
-  );
-}
-
-// 创建一个有状态组件来控制渲染哪一个页面
-class LoginControl extends React.Component {
+class Page extends React.Component {
+  // 构造器
   constructor(props) {
     super(props);
-    this.state = {
-      isLoggedIn: false
-    };
-    this.handleLoginClick = this.handleLoginClick.bind(this);
-    this.handleLogoutClick = this.handleLogoutClick.bind(this);
-  }
-
-  handleLoginClick() {
-    this.setState({isLoggedIn: true});
-  }
-
-  handleLogoutClick() {
-    this.setState({isLoggedIn: false});
-  }
+    this.state={showWarning: true};
+    this.handleToggleClick = this.handleToggleClick.bind(this);
+  };
+  
+  // 点击事件
+  handleToggleClick() {
+    // 如果要设置开关双向的必须要使用state或者prevState来获取当前的状态
+    this.setState((state) => ({
+      showWarning: !state.showWarning
+    }))
+  };
 
   render() {
-    // 先初始化默认值
-    const isLoggedIn = this.state.isLoggedIn;
-    // 声明变量
-    let button;
-    // 判断渲染哪个button
-   // if(isLoggedIn) {
-   //   button = <LogoutButton onClick={this.handleLogoutClick} />;
-   // }else {
-   //   button = <LoginButton onClick={this.handleLoginClick} />;
-   // }
-
-    button = isLoggedIn ? <LogoutButton onClick={this.handleLogoutClick} /> : <LoginButton onClick={this.handleLoginClick} />
-
     return (
       <div>
-        <Greeting isLoggedIn={isLoggedIn} />
-        {button}
+        <Warning warn={this.state.showWarning} />
+        <button onClick={this.handleToggleClick}>
+          {this.state.showWarning ? 'hide' : 'show'}
+        </button>
       </div>
-    );
+    )
   }
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<LoginControl />);
+root.render(<Page />);
 
